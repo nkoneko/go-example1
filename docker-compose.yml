@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+  app:
+    image: ogawanne/go-example1
+    ports:
+      - 10080:8080
+    environment:
+      MARIADB_USER: ${MARIADB_USER:-appuser}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:?password not set}
+      APP_DB_NAME: app
+      MYSQL_ADDR: app_db
+    links:
+      - app_db
+  app_db:
+    image: arm64v8/mariadb:latest
+    volumes:
+      - ./initdb.d:/docker-entrypoint-initdb.d
+      - app_data:/var/lib/mysql
+    environment:
+      MARIADB_USER: ${MARIADB_USER:-appuser}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:?password not set}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?password not set}
+volumes:
+  app_data:
